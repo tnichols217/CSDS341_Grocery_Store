@@ -1,6 +1,9 @@
 package csds341.tln32aac;
 
 import javax.swing.*;
+
+import csds341.tln32aac.Tables.SItem;
+
 import java.awt.*;
 
 public class GUI {
@@ -126,6 +129,53 @@ public class GUI {
         frame.getContentPane().removeAll();
         frame.setTitle("Add Item");
     }
+
+    /**
+     * shows item quantity page
+     */
+
+    public Integer getQuantity;
+
+    private void askItemQuantity() {
+        JFrame frame = new JFrame("Quantity");
+        frame.setSize(400, 300);
+        frame.setLayout(new GridBagLayout());
+
+
+        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JLabel quantity = new JLabel("Quantity:");
+        quantity.setFont(new Font("Arial", Font.PLAIN, 20));
+        JTextField quantityText = new JTextField(10);
+        JButton btnSave = new JButton("Save");
+        btnSave.setPreferredSize(new Dimension(100, 40));
+        btnSave.setFont(new Font("Arial", Font.ITALIC, 20));
+        
+
+        centerPanel.add(quantity);
+        centerPanel.add(quantityText);
+        centerPanel.add(btnSave);
+        
+        btnSave.addActionListener(e -> {
+            getQuantity = Integer.parseInt(quantityText.getText().trim());
+            System.out.println("quantity:" + getQuantity);
+        });
+
+        btnSave.addActionListener(e -> frame.dispose());
+
+        GridBagConstraints g = new GridBagConstraints();
+        g.gridx = 0;
+        g.gridy = 0;
+        g.anchor = GridBagConstraints.CENTER;
+        // Add the panel to the center of the frame
+        frame.add(centerPanel, g);
+        
+        frame.setVisible(true);
+    }
+
+    public Integer getSavedQuantity() {
+        System.out.println(getQuantity);
+        return getQuantity;
+    }
     
     /**
      * Shows the create a sale page
@@ -198,16 +248,22 @@ public class GUI {
         panel.add(btnCheckout, g);
 
         btnAdd.addActionListener(e -> {
+            askItemQuantity(); 
+
             String barcode = txtBarcode.getText().trim();
             if (!barcode.isEmpty()) {
-                String item = dbAdapter.getItemByBarcode(barcode);
+                Integer itemID = dbAdapter.getItemByBarcode(barcode);
+                SItem item = dbAdapter.getItemByID(itemID);
                 if (item != null) {
-                    itemList.addElement(item);
+                    itemList.addElement(item.name + " - " + getSavedQuantity());
                 } else {
                     JOptionPane.showMessageDialog(frame, "Item not found!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
-            }
-        });
+            };
+            
+        }
+        
+        );
 
         backbutton.addActionListener(e -> showMainMenu());
 
