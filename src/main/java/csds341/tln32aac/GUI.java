@@ -5,6 +5,8 @@ import javax.swing.*;
 import csds341.tln32aac.Tables.SItem;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class GUI {
     private JFrame frame;
@@ -136,7 +138,7 @@ public class GUI {
 
     public Integer getQuantity;
 
-    private void askItemQuantity() {
+    private void askItemQuantity(Consumer<Integer> cb) {
         JFrame frame = new JFrame("Quantity");
         frame.setSize(400, 300);
         frame.setLayout(new GridBagLayout());
@@ -156,8 +158,7 @@ public class GUI {
         centerPanel.add(btnSave);
         
         btnSave.addActionListener(e -> {
-            getQuantity = Integer.parseInt(quantityText.getText().trim());
-            System.out.println("quantity:" + getQuantity);
+            cb.accept(Integer.parseInt(quantityText.getText().trim()));
         });
 
         btnSave.addActionListener(e -> frame.dispose());
@@ -198,6 +199,8 @@ public class GUI {
 
         JPanel panel = new JPanel(new GridBagLayout());
 
+        ArrayList<SItem> items = new ArrayList<SItem>();
+        ArrayList<Integer> quantities = new ArrayList<Integer>();
         DefaultListModel<String> itemList = new DefaultListModel<>();
         JList<String> itemDisplay = new JList<>(itemList);
         itemDisplay.setPreferredSize(new Dimension(1400, 800));
@@ -248,19 +251,20 @@ public class GUI {
         panel.add(btnCheckout, g);
 
         btnAdd.addActionListener(e -> {
-            askItemQuantity(); 
-
-            String barcode = txtBarcode.getText().trim();
-            if (!barcode.isEmpty()) {
-                Integer itemID = dbAdapter.getItemByBarcode(barcode);
-                SItem item = dbAdapter.getItemByID(itemID);
-                if (item != null) {
-                    itemList.addElement(item.name + " - " + getSavedQuantity());
-                } else {
-                    JOptionPane.showMessageDialog(frame, "Item not found!", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            };
-            
+            askItemQuantity(q -> {
+                String barcode = txtBarcode.getText().trim();
+                if (!barcode.isEmpty()) {
+                    Integer itemID = dbAdapter.getItemByBarcode(barcode);
+                    SItem item = dbAdapter.getItemByID(itemID);
+                    if (item != null) {
+                        items.add(item);
+                        quantities.add(q);
+                        itemList.addElement(item.name + " - " + q);
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "Item not found!", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                };
+            }); 
         }
         
         );
