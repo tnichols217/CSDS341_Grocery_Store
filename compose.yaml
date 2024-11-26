@@ -1,0 +1,17 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server
+    container_name: csds341-mssql
+    env_file:
+      - ./.env
+    environment:
+      ACCEPT_EULA: Y
+    volumes:
+      - ./data/mssql:/var/opt/mssql:rw
+    ports:
+      - "1433:1433"
+    networks:
+      - localnet
+networks:
+  localnet:
+    driver: bridge
