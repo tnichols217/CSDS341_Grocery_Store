@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDriver;
 
+import csds341.tln32aac.Tables.*;
+
 public class SQLAdapter {
     private String DB_URL;
     private String DB_USERNAME;
@@ -82,13 +84,35 @@ public class SQLAdapter {
         return items;
     }
 
-    public String getItemByBarcode(String barcode) {
+    public Integer getItemByBarcode(String barcode) {
         try {
             PreparedStatement stmt = conn.prepareStatement("SELECT barcode FROM barcode WHERE barcode = ?");
             stmt.setString(1, barcode);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return rs.getString("name");
+                return rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public SItem getItemByID(Integer itemID) {
+        try {
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM item WHERE id =?");
+            stmt.setInt(1, itemID);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new SItem(
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getInt("currentPrice"),
+                    rs.getInt("supplier"),
+                    rs.getString("unitType"),
+                    rs.getInt("discount"),
+                    rs.getInt("cachedCurrentStock")
+                    );
             }
         } catch (SQLException e) {
             e.printStackTrace();
