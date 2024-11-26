@@ -86,7 +86,7 @@ public class SQLAdapter {
 
     public Integer getItemByBarcode(String barcode) {
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT barcode FROM barcode WHERE barcode = ?");
+            PreparedStatement stmt = conn.prepareStatement("SELECT itemID FROM barcode WHERE barcode = ?");
             stmt.setString(1, barcode);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
