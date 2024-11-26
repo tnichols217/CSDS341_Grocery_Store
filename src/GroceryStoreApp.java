@@ -51,9 +51,6 @@ public class GroceryStoreApp {
         btnLogin.setPreferredSize(new Dimension(100, 40));
         btnLogin.setFont(new Font("Arial", Font.ITALIC, 20));
         
-        // btnLogin.addActionListener(e -> {
-        //     showMainMenu();
-        // });
 
         centerPanel.add(lblID);
         centerPanel.add(txtID);
@@ -148,44 +145,88 @@ public class GroceryStoreApp {
         frame.getContentPane().removeAll();
         frame.setTitle("Add Item");
     }
+
     // Sale Page
     public void showSalePage() {
         frame.getContentPane().removeAll();
-        frame.setTitle("Sale");
+        frame.setTitle("Make Sale");
 
-        JPanel panel = new JPanel(new BorderLayout());
+        GridBagConstraints g = new GridBagConstraints();
+        g.gridx = 0;
+        g.gridy = 0;
+        g.insets = new Insets(10, 10, 0, 30); 
+        g.anchor = GridBagConstraints.NORTHWEST;
+
+        JButton backbutton = new JButton("Back");
+        backbutton.setFont(new Font("Arial", Font.PLAIN, 20));
+        backbutton.setPreferredSize(new Dimension(100, 40));
+
+        frame.add(backbutton, g);
+
+        JPanel panel = new JPanel(new GridBagLayout());
+
         DefaultListModel<String> itemList = new DefaultListModel<>();
         JList<String> itemDisplay = new JList<>(itemList);
-        itemDisplay.setPreferredSize(new Dimension(1000, 800));
-        JTextField txtBarcode = new JTextField();
+        itemDisplay.setPreferredSize(new Dimension(1400, 800));
+
+        JTextField txtBarcode = new JTextField(30);
+        txtBarcode.setPreferredSize(new Dimension(100, 50));
+
         JButton btnAdd = new JButton("Add by Barcode");
+        btnAdd.setFont(new Font("Arial", Font.PLAIN, 26));
+        btnAdd.setPreferredSize(new Dimension(320, 50));
+
         JButton btnSearch = new JButton("Search for Item");
+        btnSearch.setFont(new Font("Arial", Font.PLAIN, 26));
+        btnSearch.setPreferredSize(new Dimension(320, 50));
+
+        JPanel inputPanel = new JPanel(new GridBagLayout());
+        g.gridx = 1;
+        g.gridy = 1;
+        g.insets = new Insets(0, 0, 0, 0);
+        inputPanel.add(txtBarcode, g);
+        g.gridx = 2;
+        inputPanel.add(btnAdd, g);
+        g.gridx = 3;
+        inputPanel.add(btnSearch, g);
+
+        JScrollPane scrollPane = new JScrollPane(itemDisplay);
+        scrollPane.setPreferredSize(new Dimension(1000, 500));
+
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
         JButton btnCheckout = new JButton("Checkout");
-        JButton backbutton = new JButton("Back");
+        btnCheckout.setFont(new Font("Arial", Font.PLAIN, 26));
+        btnCheckout.setPreferredSize(new Dimension(500, 100));
 
-        JPanel inputPanel = new JPanel(new GridLayout(1, 3));
-        inputPanel.add(txtBarcode);
-        inputPanel.add(btnAdd);
-        inputPanel.add(btnSearch);
-        inputPanel.add(backbutton);
+        g.gridx = 0; // Center column
+        g.gridy = 1; // Center row
+        g.weightx = 1; // Allow stretching
+        g.weighty = 1; // Allow stretching
+        g.insets = new Insets(0, 0, 0, 0); // No margins
+        g.anchor = GridBagConstraints.CENTER; // Center in the cell
+        g.fill = GridBagConstraints.NONE; // Do not resize buttons
         
+        panel.add(inputPanel, g);
+        g.gridy = 2;
+        panel.add(scrollPane, g);
+        g.gridy = 3;
+        panel.add(btnCheckout, g);
+
+        btnAdd.addActionListener(e -> {
+            String barcode = txtBarcode.getText().trim();
+            if (!barcode.isEmpty()) {
+                String item = getItemByBarcode(barcode);
+                if (item != null) {
+                    itemList.addElement(item);
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Item not found!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
         backbutton.addActionListener(e -> showMainMenu());
-
-        panel.add(new JScrollPane(itemDisplay), BorderLayout.CENTER);
-        panel.add(inputPanel, BorderLayout.NORTH);
-        panel.add(btnCheckout, BorderLayout.SOUTH);
-
-        // btnAdd.addActionListener(e -> {
-        //     String barcode = txtBarcode.getText().trim();
-        //     if (!barcode.isEmpty()) {
-        //         String item = getItemByBarcode(barcode);
-        //         if (item != null) {
-        //             itemList.addElement(item);
-        //         } else {
-        //             JOptionPane.showMessageDialog(frame, "Item not found!", "Error", JOptionPane.ERROR_MESSAGE);
-        //         }
-        //     }
-        // });
 
         btnSearch.addActionListener(e -> showItemSearchDialog(itemList));
 
@@ -194,26 +235,27 @@ public class GroceryStoreApp {
             itemList.clear();
         });
 
-        frame.add(panel);
+        frame.add(panel, g);
+        frame.setVisible(true);
         frame.revalidate();
         frame.repaint();
     }
 
-    // // Get Item by Barcode
-    // private String getItemByBarcode(String barcode) {
-    //     try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-    //         String query = "SELECT name FROM inventory WHERE barcode = ?";
-    //         PreparedStatement stmt = conn.prepareStatement(query);
-    //         stmt.setString(1, barcode);
-    //         ResultSet rs = stmt.executeQuery();
-    //         if (rs.next()) {
-    //             return rs.getString("name");
-    //         }
-    //     } catch (SQLException e) {
-    //         e.printStackTrace();
-    //     }
-    //     return null;
-    // }
+    // Get Item by Barcode
+    private String getItemByBarcode(String barcode) {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            String query = "SELECT name FROM inventory WHERE barcode = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, barcode);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("name");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     // Item Search Dialog
     private void showItemSearchDialog(DefaultListModel<String> itemList) {
