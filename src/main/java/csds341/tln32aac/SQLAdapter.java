@@ -90,7 +90,7 @@ public class SQLAdapter {
             stmt.setString(1, barcode);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return rs.getInt("id");
+                return rs.getInt("itemID");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -99,25 +99,7 @@ public class SQLAdapter {
     }
 
     public SItem getItemByID(Integer itemID) {
-        try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM item WHERE id =?");
-            stmt.setInt(1, itemID);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new SItem(
-                    rs.getInt("id"),
-                    rs.getString("name"),
-                    rs.getInt("currentPrice"),
-                    rs.getInt("supplier"),
-                    rs.getString("unitType"),
-                    rs.getInt("discount"),
-                    rs.getInt("cachedCurrentStock")
-                    );
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return SItem.getItem(itemID, conn);
     }
 
     public boolean insertBarcode(String barcode, Integer itemID) {
