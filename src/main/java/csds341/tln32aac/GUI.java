@@ -135,9 +135,6 @@ public class GUI {
     /**
      * shows item quantity page
      */
-
-    public Integer getQuantity;
-
     private void askItemQuantity(Consumer<Integer> cb) {
         JFrame frame = new JFrame("Quantity");
         frame.setSize(400, 300);
@@ -173,11 +170,6 @@ public class GUI {
         frame.setVisible(true);
     }
 
-    public Integer getSavedQuantity() {
-        System.out.println(getQuantity);
-        return getQuantity;
-    }
-    
     /**
      * Shows the create a sale page
      */
