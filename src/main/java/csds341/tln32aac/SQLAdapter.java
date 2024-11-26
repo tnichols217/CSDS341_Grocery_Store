@@ -98,10 +98,6 @@ public class SQLAdapter {
         return null;
     }
 
-    public SItem getItemByID(Integer itemID) {
-        return SItem.getItem(itemID, conn);
-    }
-
     public boolean insertBarcode(String barcode, Integer itemID) {
         try {
             PreparedStatement stmt = conn.prepareStatement("EXEC InsertBarcode @ean13 = ?, @itemID = ?;");
@@ -142,5 +138,39 @@ public class SQLAdapter {
             return false;
         }
         return true;
+    }
+
+    // Table CRUD operations overloads
+
+    public SEmployee getEmployeeByID(Integer employeeID) {
+        return SEmployee.getEmployee(employeeID, conn);
+    }
+
+    public SItem getItemByID(Integer itemID) {
+        return SItem.getItem(itemID, conn);
+    }
+
+    public SRestock getRestockByID(Integer restockID) {
+        return SRestock.getRestock(restockID, conn);
+    }
+
+    public SRestockItem getRestockItemByID(Integer restockID, Integer itemID) {
+        return SRestockItem.getRestockItem(restockID, itemID, conn);
+    }
+
+    public ArrayList<SRestockItem> getFullRestock(Integer restockID) {
+        return SRestockItem.getRestock(restockID, conn);
+    }
+
+    public SSale getSaleByID(Integer saleID) {
+        return SSale.getSale(saleID, conn);
+    }
+
+    public SSaleItem getSaleItemByID(Integer saleID, Integer itemID) {
+        return SSaleItem.getSaleItem(saleID, itemID, conn);
+    }
+
+    public ArrayList<SSaleItem> getFullSale(Integer saleID) {
+        return SSaleItem.getSale(saleID, conn);
     }
 }

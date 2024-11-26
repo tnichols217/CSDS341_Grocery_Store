@@ -32,10 +32,10 @@ public class SRestock {
         this.additionalCost = additionalCost;
     }
 
-    public static SRestock getRestock (Integer saleID, Connection conn) {
+    public static SRestock getRestock (Integer restockID, Connection conn) {
         try {
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM restock WHERE id = ?");
-            stmt.setInt(1, saleID);
+            stmt.setInt(1, restockID);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return new SRestock(
