@@ -1,29 +1,19 @@
+package csds341.tln32aac;
+
 import javax.swing.*;
 import java.awt.*;
-import java.sql.*;
 
-public class GroceryStoreApp {
-
-    // Database connection details
-    // SQLServerDriver.register();
-    private static final String DB_URL = 
-        "jdbc:sqlserver://172.20.15.194;" + //
-        "databaseName=Grocery;" + //
-        "encrypt=false";
-
-    private static final String DB_USERNAME = "sa";
-    private static final String DB_PASSWORD = "SuperSecurePassword1";
-
+public class GUI {
     private JFrame frame;
+    private SQLAdapter dbAdapter;
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            GroceryStoreApp app = new GroceryStoreApp();
-            app.showLoginPage();
-        });
+    public GUI(SQLAdapter dbAdapter) {
+        this.dbAdapter = dbAdapter;
     }
 
-    // Login Page
+    /**
+     * Shows the login page for the grocery store database
+     */
     public void showLoginPage() {
         frame = new JFrame("Grocery Store Database");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -61,8 +51,8 @@ public class GroceryStoreApp {
         frame.add(centerPanel, g);
         
         btnLogin.addActionListener(e -> {
-            String employeeID = txtID.getText().trim();
-            if (validateEmployeeID(employeeID)) {
+            Integer employeeID = Integer.parseInt(txtID.getText().trim());
+            if (dbAdapter.validateEmployeeID(employeeID)) {
                 showMainMenu();
             } else {
                 JOptionPane.showMessageDialog(frame, "Invalid Employee ID", "Error", JOptionPane.ERROR_MESSAGE);
@@ -72,21 +62,9 @@ public class GroceryStoreApp {
         frame.setVisible(true);
     }
 
-    //Validate Employee ID
-    private boolean validateEmployeeID(String employeeID) {
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            String query = "SELECT * FROM employee WHERE id = ?";
-            PreparedStatement stmt = conn.prepareStatement(query);
-            stmt.setString(1, employeeID);
-            ResultSet rs = stmt.executeQuery();
-            return rs.next();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    // Main Menu
+    /**
+     * Show the main menu for the grocery store database
+     */
     public void showMainMenu() {
         frame.getContentPane().removeAll();
         frame.setTitle("Main Menu");
@@ -141,12 +119,17 @@ public class GroceryStoreApp {
     
     }
 
+    /**
+     * Shows the add item page
+     */
     public void showAddItemPage() {
         frame.getContentPane().removeAll();
         frame.setTitle("Add Item");
     }
-
-    // Sale Page
+    
+    /**
+     * Shows the create a sale page
+     */
     public void showSalePage() {
         frame.getContentPane().removeAll();
         frame.setTitle("Make Sale");
@@ -217,7 +200,7 @@ public class GroceryStoreApp {
         btnAdd.addActionListener(e -> {
             String barcode = txtBarcode.getText().trim();
             if (!barcode.isEmpty()) {
-                String item = getItemByBarcode(barcode);
+                String item = dbAdapter.getItemByBarcode(barcode);
                 if (item != null) {
                     itemList.addElement(item);
                 } else {
@@ -241,23 +224,10 @@ public class GroceryStoreApp {
         frame.repaint();
     }
 
-    // Get Item by Barcode
-    private String getItemByBarcode(String barcode) {
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-            String query = "SELECT name FROM inventory WHERE barcode = ?";
-            PreparedStatement stmt = conn.prepareStatement(query);
-            stmt.setString(1, barcode);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getString("name");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    // Item Search Dialog
+    /**
+     * Opens a window to search for items
+     * @param itemList The list of items to populate with the searched items
+     */
     private void showItemSearchDialog(DefaultListModel<String> itemList) {
         JDialog dialog = new JDialog(frame, "Item Search", true);
         dialog.setSize(400, 300);
@@ -299,24 +269,9 @@ public class GroceryStoreApp {
         dialog.setVisible(true);
     }
 
-    // Search Items in Database
-    // private ArrayList<String> searchItems(String query) {
-    //     ArrayList<String> items = new ArrayList<>();
-    //     try (Connection conn = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD)) {
-    //         String sql = "SELECT name FROM inventory WHERE name LIKE ?";
-    //         PreparedStatement stmt = conn.prepareStatement(sql);
-    //         stmt.setString(1, "%" + query + "%");
-    //         ResultSet rs = stmt.executeQuery();
-    //         while (rs.next()) {
-    //             items.add(rs.getString("name"));
-    //         }
-    //     } catch (SQLException e) {
-    //         e.printStackTrace();
-    //     }
-    //     return items;
-    // }
-
-    // Restock Page
+    /**
+     * Shows the restock page for creating restock requests
+     */
     public void showRestockPage() {
         frame.getContentPane().removeAll();
         frame.setTitle("Restock");
@@ -330,7 +285,9 @@ public class GroceryStoreApp {
         frame.repaint();
     }
 
-    // Store Status Page
+    /**
+     * Shows the store status page for displaying inventory details and current statuses
+     */
     public void showStoreStatusPage() {
         frame.getContentPane().removeAll();
         frame.setTitle("Store Status");

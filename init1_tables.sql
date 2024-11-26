@@ -50,22 +50,22 @@ CREATE TABLE employee (
 
 CREATE TABLE payment (
     id INT IDENTITY(1,1) PRIMARY KEY,
-    timestamp SMALLDATETIME NOT NULL,
+    timestamp SMALLDATETIME DEFAULT CURRENT_TIMESTAMP,
     chequeNumber INT NOT NULL
 );
 
 CREATE TABLE sale (
     id INT IDENTITY(1,1) PRIMARY KEY,
     employeeID INT NOT NULL REFERENCES employee(id),
-    timestamp SMALLDATETIME NOT NULL,
-    tip INT NOT NULL,
+    timestamp SMALLDATETIME DEFAULT CURRENT_TIMESTAMP,
+    tip INT DEFAULT 0,
     paymentID INT NOT NULL REFERENCES payment(id)
 );
 
 CREATE TABLE shift (
     employeeID INT REFERENCES employee(id),
-    startTime SMALLDATETIME,
-    endTime SMALLDATETIME NOT NULL,
+    startTime SMALLDATETIME DEFAULT CURRENT_TIMESTAMP,
+    endTime SMALLDATETIME,
     wage INT NOT NULL,
     paymentID INT NOT NULL REFERENCES payment(id),
     duration AS (
