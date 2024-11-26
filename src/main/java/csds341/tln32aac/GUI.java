@@ -290,7 +290,6 @@ public class GUI {
         DefaultListModel<String> searchResults = new DefaultListModel<>();
         JList<String> searchDisplay = new JList<>(searchResults);
         JButton btnAdd = new JButton("Add Selected");
-        JButton backbutton = new JButton("Back");
 
         JPanel inputPanel = new JPanel(new BorderLayout());
         inputPanel.add(txtSearch, BorderLayout.CENTER);
@@ -316,7 +315,6 @@ public class GUI {
         dialog.add(inputPanel, BorderLayout.NORTH);
         dialog.add(new JScrollPane(searchDisplay), BorderLayout.CENTER);
         dialog.add(btnAdd, BorderLayout.SOUTH);
-        dialog.add(backbutton);
 
         dialog.setVisible(true);
     }
