@@ -130,7 +130,10 @@ public class GUI {
         btnSale.addActionListener(e -> showSalePage());
         btnRestock.addActionListener(e -> showRestockPage());
         btnCheckStatus.addActionListener(e -> showStoreStatusPage());
-        btnLogout.addActionListener(e -> showLoginPage());
+        btnLogout.addActionListener(e -> {
+            frame.dispose();
+            showLoginPage();
+        });
 
         frame.setVisible(true);
         frame.revalidate();
@@ -417,8 +420,9 @@ public class GUI {
                     String receipt = "Sale number: " + sale.id.toString() + "\n" + 
                     String.format("%20s %5s %5s", "Name", "Num", "Total") +
                         saleItems.stream()
-                        .map(s -> "" + String.format("%20s", s.item.name) + " " + String.format("%5d", s.quantity) + " " + String.format("%5d", s.totalCost))
+                        .map(s -> "" + String.format("%20s", s.item.name) + " " + String.format("%5d", s.quantity) + " " + String.format("%5f", ((double) s.totalCost)/100))
                             .reduce("", (a, b) -> a + "\n" + b) +
+                            String.format("\nTip: %d", ((double) sale.tipAmount)/100) +
                             String.format("\nTotal cost: %d", sale.total);
                     JOptionPane.showMessageDialog(frame, receipt, "Reciept", JOptionPane.INFORMATION_MESSAGE);
                 } else {
