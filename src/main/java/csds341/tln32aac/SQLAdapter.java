@@ -65,6 +65,24 @@ public class SQLAdapter {
         }
     }
 
+    public boolean addItem(String name, Integer currentPrice, Integer supplier, String unitType, Integer discount, Integer stock) {
+        try {
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO item (name, currentPrice, supplier, unitType, discount, stock ) VALUES (?, ?, ?, ?, ?, ?);");
+            stmt.setString(1, name);
+            stmt.setInt(2, currentPrice);
+            stmt.setInt(3, supplier);
+            stmt.setString(4, unitType);
+            stmt.setInt(5, discount);
+            stmt.setInt(6, stock);
+            stmt.execute();
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+
+    }
     public ArrayList<String> searchItems(String query) {
         return searchItems(query, 100);
     }

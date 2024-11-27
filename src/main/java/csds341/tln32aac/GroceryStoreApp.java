@@ -17,7 +17,7 @@ public class GroceryStoreApp {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             GUI app = new GUI(
-                new SQLAdapter(DB_URL, DB_USERNAME, DB_PASSWORD)
+                null
             );
             app.showLoginPage();
         });
