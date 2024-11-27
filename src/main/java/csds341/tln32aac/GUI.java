@@ -163,9 +163,9 @@ public class GUI {
         itemName.setFont(new Font("Arial", Font.PLAIN, 20));
         JLabel itemCurrentPrice = new JLabel("Item current price: ");
         itemCurrentPrice.setFont(new Font("Arial", Font.PLAIN, 20));
-        JLabel itemSupplier = new JLabel("Item supplier phone number: ");
+        JLabel itemSupplier = new JLabel("Item supplier ID: ");
         itemSupplier.setFont(new Font("Arial", Font.PLAIN, 20));
-        JLabel itemUnitType = new JLabel("Item unit type (item, weight, volume): ");
+        JLabel itemUnitType = new JLabel("Item unit type (quantity, weight, or volume): ");
         itemUnitType.setFont(new Font("Arial", Font.PLAIN, 20));
         JLabel itemDiscount = new JLabel("Item discount percentage: ");
         itemDiscount.setFont(new Font("Arial", Font.PLAIN, 20));
@@ -457,7 +457,7 @@ public class GUI {
     public void showRestockPage() {
         frame.getContentPane().removeAll();
         frame.setTitle("Restock");
-        
+
         GridBagConstraints g = new GridBagConstraints();
         g.gridx = 0;
         g.gridy = 0;
