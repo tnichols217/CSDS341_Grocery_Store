@@ -216,7 +216,7 @@ public class GUI {
             Integer currentPrice = Integer.parseInt(itemCurrentPriceTxt.getText().trim());
             Integer supplier = Integer.parseInt(itemSupplierTxt.getText().trim());
             String unitType = itemUnitTypeTxt.getText().trim();
-            Integer discount = Integer.parseInt(itemDiscount.getText().trim());
+            Integer discount = Integer.parseInt(itemDiscountTxt.getText().trim());
 
             
             if (dbAdapter.addItem(item, currentPrice, supplier, unitType, discount)) {
@@ -385,6 +385,8 @@ public class GUI {
                 JOptionPane.showMessageDialog(frame, "Failed to create sale", "Failiure", JOptionPane.INFORMATION_MESSAGE);
             }
             itemList.clear();
+            items.clear();
+            quantities.clear();
         });
 
         frame.add(panel, g);
@@ -436,6 +438,7 @@ public class GUI {
         });
 
         btnAdd.addActionListener(e -> {
+            dialog.dispose();
             int[] selected = searchDisplay.getSelectedIndices();
             for (int s: selected) {
                 askItemQuantity(q -> {
