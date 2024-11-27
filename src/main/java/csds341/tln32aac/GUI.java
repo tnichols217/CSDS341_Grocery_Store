@@ -94,7 +94,7 @@ public class GUI {
 
 
         JPanel panel = new JPanel(new GridLayout(4, 1, 10, 10));
-        JButton btnAddItem = new JButton("Add Item to Grocery Store");
+        JButton btnAddItem = new JButton("Add Item");
         btnAddItem.setPreferredSize(new Dimension(400, 100));
         btnAddItem.setFont(new Font("Arial", Font.BOLD, 26));
         JButton btnSale = new JButton("Make Sale");
@@ -568,6 +568,7 @@ public class GUI {
         String[] columns = new String[]{"ID", "Name", "Current Price", "Supplier", "Unit Type", "Discount", "Stock", "Target Amount"};
 
         JTable table = new JTable(tableData, columns);
+        table.setPreferredSize(new Dimension(1000, 600));
         frame.add(new JScrollPane(table));
 
         // Implement similar logic for displaying inventory details
