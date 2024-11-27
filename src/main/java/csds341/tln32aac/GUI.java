@@ -568,11 +568,8 @@ public class GUI {
         String[] columns = new String[]{"ID", "Name", "Current Price", "Supplier", "Unit Type", "Discount", "Stock", "Target Amount"};
 
         JTable table = new JTable(tableData, columns);
-        table.setPreferredSize(new Dimension(1000, 600));
+        table.setPreferredSize(new Dimension(1200, 600));
         frame.add(new JScrollPane(table));
-
-        // Implement similar logic for displaying inventory details
-        // ...
 
         frame.revalidate();
         frame.repaint();
