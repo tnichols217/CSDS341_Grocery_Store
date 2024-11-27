@@ -479,12 +479,13 @@ public class GUI {
         String[][] tableData = restocks.stream().map(statusFormatter).toArray(String[][]::new);
         String[] columns = new String[]{"ID", "Supplier ID", "Status", "Order Date", "Confirm Date", "Delivery Date", "Restock Date", "Additional Cost"};
 
+        g.gridx = 1;
+        g.gridy = 1;
+        g.anchor = GridBagConstraints.NORTH;
         JTable table = new JTable(tableData, columns);
-        frame.add(new JScrollPane(table));
+        frame.add(new JScrollPane(table), g);
         
-        // Implement similar logic for displaying restock details and updating statuses
-        // ...
-
+        frame.setVisible(true);
         frame.revalidate();
         frame.repaint();
     }
