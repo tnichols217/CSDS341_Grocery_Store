@@ -112,32 +112,37 @@ public class SQLAdapter {
         return true;
     }
 
-    public boolean createSale(Integer employeeID, ArrayList<Integer> itemID, ArrayList<Integer> quantity, Integer tip) {
+    public Integer createSale(Integer employeeID, ArrayList<SItem> saleItems, ArrayList<Integer> quantity, Integer tip) {
         try {
 
             // Insert into sales table
-            PreparedStatement stmt = conn.prepareStatement("INSERT INTO sale (employeeID, tip) VALUES (?, ?);");
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO sale (employeeID, tip) VALUES (?, ?); SELECT SCOPE_IDENTITY();");
             stmt.setInt(1, employeeID);
             stmt.setInt(2, tip);
-            stmt.executeUpdate();
+            
+            ResultSet res = stmt.executeQuery();
 
+            res.next();
+            
             // Get the last inserted sale ID
-            int saleID = conn.prepareStatement("SELECT SCOPE_IDENTITY();").executeQuery().getInt(1);
+            int saleID = res.getInt(1);
 
             // Insert into sales_items table
-            for (int i = 0; i < itemID.size(); i++) {
-                stmt = conn.prepareStatement("INSERT INTO sales_items (saleID, itemID, quantity) VALUES (?,?,?);");
+            for (int i = 0; i < saleItems.size(); i++) {
+                stmt = conn.prepareStatement("INSERT INTO saleItem (saleID, itemID, quantity, unitCost, discount) VALUES (?,?,?,?,?);");
                 stmt.setInt(1, saleID);
-                stmt.setInt(2, itemID.get(i));
+                stmt.setInt(2, saleItems.get(i).id);
                 stmt.setInt(3, quantity.get(i));
+                stmt.setInt(4, saleItems.get(i).currentPrice);
+                stmt.setInt(5, saleItems.get(i).discount);
                 stmt.executeUpdate();
             }
             conn.commit();
+            return saleID;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }
-        return true;
+        return null;
     }
 
     // Table CRUD operations overloads

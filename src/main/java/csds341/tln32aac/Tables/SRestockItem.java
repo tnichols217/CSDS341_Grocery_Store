@@ -10,6 +10,7 @@ public class SRestockItem {
     public Date expiryDate;
     public Integer unitCost;
     public Integer totalCost;
+    public SItem item;
 
     public SRestockItem(
         Integer restockID,
@@ -17,7 +18,8 @@ public class SRestockItem {
         Integer quantity,
         Date expiryDate,
         Integer unitCost,
-        Integer totalCost
+        Integer totalCost,
+        SItem item
     ) {
         this.restockID = restockID;
         this.itemID = itemID;
@@ -25,6 +27,14 @@ public class SRestockItem {
         this.expiryDate = expiryDate;
         this.unitCost = unitCost;
         this.totalCost = totalCost;
+        this.item = item;
+    }
+
+    public SItem getItem(Connection conn) {
+        if (this.item == null) {
+            this.item = SItem.getItem(this.itemID, conn);
+        }
+        return this.item;
     }
 
     public static SRestockItem getRestockItem (Integer restockID, Integer itemID, Connection conn) {
@@ -40,7 +50,8 @@ public class SRestockItem {
                     rs.getInt("quantity"),
                     rs.getDate("expiryDate"),
                     rs.getInt("unitCost"),
-                    rs.getInt("totalCost")
+                    rs.getInt("totalCost"),
+                    null
                 );
             }
         } catch (SQLException e) {
@@ -52,7 +63,14 @@ public class SRestockItem {
     public static ArrayList<SRestockItem> getRestock (Integer restockID, Connection conn) {
         ArrayList<SRestockItem> restockItems = new ArrayList<>();
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM restockItem WHERE restockID = ?");
+            PreparedStatement stmt = conn.prepareStatement(
+                "SELECT "
+                + "ri.restockID, ri.itemID, ri.quantity, ri.expiryDate, ri.unitCost, ri.totalCost, "
+                + "i.name, i.currentPrice, i.supplier, i.unitType, i.discount, i.cachedCurrentStock, i.targetAmount "
+                + "FROM restockItem AS ri "
+                + "WHERE si.saleID = ? "
+                + "JOIN item AS i ON si.itemID = i.id "
+            );
             stmt.setInt(1, restockID);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -63,7 +81,17 @@ public class SRestockItem {
                         rs.getInt("quantity"),
                         rs.getDate("expiryDate"),
                         rs.getInt("unitCost"),
-                        rs.getInt("totalCost")
+                        rs.getInt("totalCost"),
+                        new SItem(
+                            rs.getInt("saleID"),
+                            rs.getString("name"),
+                            rs.getInt("currentPrice"),
+                            rs.getInt("supplier"),
+                            rs.getString("unitType"),
+                            rs.getInt("discount"),
+                            rs.getInt("cachedCurrentStock"),
+                            rs.getInt("targetAmount")
+                        )
                     )
                 );
             }

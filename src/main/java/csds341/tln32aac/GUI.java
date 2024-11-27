@@ -2,15 +2,20 @@ package csds341.tln32aac;
 
 import javax.swing.*;
 
+import csds341.tln32aac.Tables.SEmployee;
 import csds341.tln32aac.Tables.SItem;
+import csds341.tln32aac.Tables.SSale;
+import csds341.tln32aac.Tables.SSaleItem;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 public class GUI {
     private JFrame frame;
     private SQLAdapter dbAdapter;
+    private SEmployee employee;
 
     public GUI(SQLAdapter dbAdapter) {
         this.dbAdapter = dbAdapter;
@@ -58,6 +63,7 @@ public class GUI {
         btnLogin.addActionListener(e -> {
             Integer employeeID = Integer.parseInt(txtID.getText().trim());
             if (dbAdapter.validateEmployeeID(employeeID)) {
+                employee = dbAdapter.getEmployeeByID(employeeID);
                 showMainMenu();
             } else {
                 JOptionPane.showMessageDialog(frame, "Invalid Employee ID", "Error", JOptionPane.ERROR_MESSAGE);
@@ -256,17 +262,27 @@ public class GUI {
                         JOptionPane.showMessageDialog(frame, "Item not found!", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 };
-            }); 
-        }
-        
-        );
+            });
+        });
 
         backbutton.addActionListener(e -> showMainMenu());
 
         btnSearch.addActionListener(e -> showItemSearchDialog(itemList));
 
         btnCheckout.addActionListener(e -> {
-            JOptionPane.showMessageDialog(frame, "Receipt printed!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            Integer saleID = dbAdapter.createSale(employee.id, items, quantities, 0);
+            if (saleID != null) {
+                SSale sale = dbAdapter.getSaleByID(saleID);
+                ArrayList<SSaleItem> saleItems = dbAdapter.getFullSale(saleID);
+                String receipt = "Sale number: " + sale.id.toString() + "\n" + 
+                    String.format("%20s %5s %5s", "Name", "Num", "Total") +
+                    saleItems.stream()
+                        .map(s -> "" + String.format("%20s", s.item.name) + " " + String.format("%5d", s.quantity) + " " + String.format("%5d", s.totalCost))
+                        .reduce("", (a, b) -> a + "\n" + b);
+                JOptionPane.showMessageDialog(frame, receipt, "Reciept", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(frame, "Failed to create sale", "Failiure", JOptionPane.INFORMATION_MESSAGE);
+            }
             itemList.clear();
         });
 

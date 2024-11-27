@@ -59,7 +59,7 @@ CREATE TABLE sale (
     employeeID INT NOT NULL REFERENCES employee(id),
     timestamp SMALLDATETIME DEFAULT CURRENT_TIMESTAMP,
     tip INT DEFAULT 0,
-    paymentID INT NOT NULL REFERENCES payment(id)
+    paymentID INT REFERENCES payment(id)
 );
 
 CREATE TABLE shift (
