@@ -278,7 +278,8 @@ public class GUI {
                     String.format("%20s %5s %5s", "Name", "Num", "Total") +
                     saleItems.stream()
                         .map(s -> "" + String.format("%20s", s.item.name) + " " + String.format("%5d", s.quantity) + " " + String.format("%5d", s.totalCost))
-                        .reduce("", (a, b) -> a + "\n" + b);
+                        .reduce("", (a, b) -> a + "\n" + b) +
+                    String.format("\nTotal cost: %d", sale.total);
                 JOptionPane.showMessageDialog(frame, receipt, "Reciept", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(frame, "Failed to create sale", "Failiure", JOptionPane.INFORMATION_MESSAGE);

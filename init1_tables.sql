@@ -84,7 +84,7 @@ CREATE TABLE saleItem (
     unitCost INT NOT NULL,
     discount INT NOT NULL,
     totalCost AS (
-        quantity * unitCost * (1 - discount) / 1000
+        quantity * unitCost * (100 - discount) / 100
     ),
     PRIMARY KEY (saleID, itemID)
 );

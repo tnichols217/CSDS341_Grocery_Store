@@ -11,6 +11,7 @@ public class SRestock {
     public Date deliveryDate;
     public Date restockDate;
     public Integer additionalCost;
+    public Integer totalCost;
 
     public SRestock(
         Integer id,
@@ -20,7 +21,8 @@ public class SRestock {
         Date confirmDate,
         Date deliveryDate,
         Date restockDate,
-        Integer additionalCost
+        Integer additionalCost,
+        Integer totalCost
     ) {
         this.id = id;
         this.supplierID = supplierID;
@@ -30,11 +32,12 @@ public class SRestock {
         this.deliveryDate = deliveryDate;
         this.restockDate = restockDate;
         this.additionalCost = additionalCost;
+        this.totalCost = totalCost;
     }
 
     public static SRestock getRestock (Integer restockID, Connection conn) {
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM restock WHERE id = ?");
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM v_restock WHERE id = ?");
             stmt.setInt(1, restockID);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -46,7 +49,8 @@ public class SRestock {
                     rs.getDate("confirmDate"),
                     rs.getDate("deliveryDate"),
                     rs.getDate("restockDate"),
-                    rs.getInt("additionalCost")
+                    rs.getInt("additionalCost"),
+                    rs.getInt("totalCost")
                 );
             }
         } catch (SQLException e) {
