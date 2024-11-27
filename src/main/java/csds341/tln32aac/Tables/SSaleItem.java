@@ -10,6 +10,7 @@ public class SSaleItem {
     public Integer unitCost;
     public Integer discount;
     public Integer totalCost;
+    public SItem item;
 
     public SSaleItem(
         Integer saleID,
@@ -17,7 +18,8 @@ public class SSaleItem {
         Integer quantity,
         Integer unitCost,
         Integer discount,
-        Integer totalCost
+        Integer totalCost,
+        SItem item
     ) {
         this.saleID = saleID;
         this.itemID = itemID;
@@ -25,6 +27,14 @@ public class SSaleItem {
         this.unitCost = unitCost;
         this.discount = discount;
         this.totalCost = totalCost;
+        this.item = item;
+    }
+
+    public SItem getItem(Connection conn) {
+        if (this.item == null) {
+            this.item = SItem.getItem(this.itemID, conn);
+        }
+        return this.item;
     }
 
     public static SSaleItem getSaleItem(Integer saleID, Integer itemID, Connection conn) {
@@ -40,7 +50,8 @@ public class SSaleItem {
                     rs.getInt("quantity"),
                     rs.getInt("unitCost"),
                     rs.getInt("discount"),
-                    rs.getInt("totalCost")
+                    rs.getInt("totalCost"),
+                    null
                 );
             }
         } catch (SQLException e) {
@@ -52,7 +63,14 @@ public class SSaleItem {
     public static ArrayList<SSaleItem> getSale(Integer saleID, Connection conn) {
         ArrayList<SSaleItem> saleItems = new ArrayList<>();
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM saleItem WHERE saleID =?");
+            PreparedStatement stmt = conn.prepareStatement(
+                "SELECT "
+                + "si.saleID, si.itemID, si.quantity, si.unitCost, si.discount, si.totalCost, "
+                + "i.name, i.currentPrice, i.supplier, i.unitType, i.discount, i.cachedCurrentStock, i.targetAmount "
+                + "FROM saleItem AS si "
+                + "JOIN item AS i ON si.itemID = i.id "
+                + "WHERE si.saleID = ? "
+            );
             stmt.setInt(1, saleID);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -63,7 +81,17 @@ public class SSaleItem {
                         rs.getInt("quantity"),
                         rs.getInt("unitCost"),
                         rs.getInt("discount"),
-                        rs.getInt("totalCost")
+                        rs.getInt("totalCost"),
+                        new SItem(
+                            rs.getInt("saleID"),
+                            rs.getString("name"),
+                            rs.getInt("currentPrice"),
+                            rs.getInt("supplier"),
+                            rs.getString("unitType"),
+                            rs.getInt("discount"),
+                            rs.getInt("cachedCurrentStock"),
+                            rs.getInt("targetAmount")
+                        )
                     )
                 );
             }

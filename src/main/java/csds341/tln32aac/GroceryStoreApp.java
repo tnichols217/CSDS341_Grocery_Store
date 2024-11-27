@@ -4,10 +4,8 @@ import javax.swing.SwingUtilities;
 
 public class GroceryStoreApp {
 
-    // Database connection details
-    // SQLServerDriver.register();
     private static String DB_URL = 
-        "jdbc:sqlserver://172.20.15.194;" + //
+        "jdbc:sqlserver://localhost;" + //
         "databaseName=Grocery;" + //
         "encrypt=false";
 

@@ -10,6 +10,7 @@ public class SItem {
     public String unitType;
     public Integer discount;
     public Integer stock;
+    public Integer targetAmount;
 
     public SItem(
         Integer id,
@@ -18,7 +19,8 @@ public class SItem {
         Integer supplier,
         String unitType,
         Integer discount,
-        Integer stock
+        Integer stock,
+        Integer targetAmount
     ) {
         this.id = id;
         this.name = name;
@@ -27,6 +29,7 @@ public class SItem {
         this.unitType = unitType;
         this.discount = discount;
         this.stock = stock;
+        this.targetAmount = targetAmount;
     }
 
     public static SItem getItem(Integer itemID, Connection conn) {
@@ -42,7 +45,8 @@ public class SItem {
                     rs.getInt("supplier"),
                     rs.getString("unitType"),
                     rs.getInt("discount"),
-                    rs.getInt("cachedCurrentStock")
+                    rs.getInt("cachedCurrentStock"),
+                    rs.getInt("targetAmount")
                 );
             }
         } catch (SQLException e) {
