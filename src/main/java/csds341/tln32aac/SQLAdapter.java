@@ -115,8 +115,8 @@ public class SQLAdapter {
             return false;
         }
         return true;
-
     }
+    
     public ArrayList<SItem> searchItems(String query) {
         return searchItems(query, 100);
     }

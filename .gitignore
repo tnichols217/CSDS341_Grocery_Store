@@ -5,3 +5,5 @@ result
 .env
 data
 target
+bin
+lib

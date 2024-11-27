@@ -2,20 +2,12 @@ package csds341.tln32aac;
 
 import javax.swing.*;
 
-import csds341.tln32aac.Tables.SEmployee;
-import csds341.tln32aac.Tables.SItem;
-import csds341.tln32aac.Tables.SRestock;
-import csds341.tln32aac.Tables.SSale;
-import csds341.tln32aac.Tables.SSaleItem;
+import csds341.tln32aac.Tables.*;
 
 import java.awt.*;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Stream;
+import java.util.function.*;
 
 public class GUI {
     private JFrame frame;
