@@ -486,8 +486,9 @@ public class GUI {
         g.gridy = 1;
         g.anchor = GridBagConstraints.NORTH;
         JTable table = new JTable(tableData, columns);
+        table.setPreferredSize(new Dimension(1200, 600));
         frame.add(new JScrollPane(table), g);
-        
+
         frame.setVisible(true);
         frame.revalidate();
         frame.repaint();
