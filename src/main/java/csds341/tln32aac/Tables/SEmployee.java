@@ -28,7 +28,7 @@ public class SEmployee {
 
     public static SEmployee getEmployee(Integer employeeID, Connection conn) {
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM employee WHERE id = ?");
+            PreparedStatement stmt = conn.prepareStatement("EXEC GetEmployeeByID @employeeID = ?;");
             stmt.setInt(1, employeeID);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {

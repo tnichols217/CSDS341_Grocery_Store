@@ -34,7 +34,7 @@ public class SItem {
 
     public static SItem getItem(Integer itemID, Connection conn) {
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM item WHERE id = ?");
+            PreparedStatement stmt = conn.prepareStatement("EXEC GetItemByID @itemID = ?");
             stmt.setInt(1, itemID);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {

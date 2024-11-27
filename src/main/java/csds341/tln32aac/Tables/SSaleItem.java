@@ -39,7 +39,7 @@ public class SSaleItem {
 
     public static SSaleItem getSaleItem(Integer saleID, Integer itemID, Connection conn) {
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM saleItem WHERE saleID = ? AND itemID = ?");
+            PreparedStatement stmt = conn.prepareStatement("EXEC GetSaleItemByID @saleID = ?, @itemID = ?");
             stmt.setInt(1, saleID);
             stmt.setInt(2, itemID);
             ResultSet rs = stmt.executeQuery();
@@ -63,14 +63,7 @@ public class SSaleItem {
     public static ArrayList<SSaleItem> getSale(Integer saleID, Connection conn) {
         ArrayList<SSaleItem> saleItems = new ArrayList<>();
         try {
-            PreparedStatement stmt = conn.prepareStatement(
-                "SELECT "
-                + "si.saleID, si.itemID, si.quantity, si.unitCost, si.discount, si.totalCost, "
-                + "i.name, i.currentPrice, i.supplier, i.unitType, i.discount, i.cachedCurrentStock, i.targetAmount "
-                + "FROM saleItem AS si "
-                + "JOIN item AS i ON si.itemID = i.id "
-                + "WHERE si.saleID = ? "
-            );
+            PreparedStatement stmt = conn.prepareStatement("EXEC GetFulLSale @saleID = ?;");
             stmt.setInt(1, saleID);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {

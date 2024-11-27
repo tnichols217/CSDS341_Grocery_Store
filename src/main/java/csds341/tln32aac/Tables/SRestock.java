@@ -37,7 +37,7 @@ public class SRestock {
 
     public static SRestock getRestock (Integer restockID, Connection conn) {
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM v_restock WHERE id = ?");
+            PreparedStatement stmt = conn.prepareStatement("EXEC GetRestockByID @restockID = ?");
             stmt.setInt(1, restockID);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {

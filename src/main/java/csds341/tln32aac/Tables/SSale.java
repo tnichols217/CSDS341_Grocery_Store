@@ -31,7 +31,7 @@ public class SSale {
 
     public static SSale getSale(Integer saleID, Connection conn) {
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM v_sale WHERE id = ?");
+            PreparedStatement stmt = conn.prepareStatement("EXEC GetSaleByID @saleID = ?;");
             stmt.setInt(1, saleID);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {

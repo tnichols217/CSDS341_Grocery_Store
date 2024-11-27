@@ -153,3 +153,64 @@ AS
 BEGIN
     SELECT * FROM employee WHERE id = @employeeID;
 END;
+
+CREATE PROCEDURE GetItemByID
+    @itemID INT
+AS
+BEGIN
+    SELECT * FROM item WHERE id = @itemID;
+END;
+
+CREATE PROCEDURE GetRestockByID
+    @restockID INT
+AS
+BEGIN
+    SELECT * FROM v_restock WHERE id = @restockID;
+END;
+
+CREATE PROCEDURE GetRestockItemByID
+    @restockID INT,
+    @itemID INT
+AS
+BEGIN
+    SELECT * FROM restockItem WHERE restockID = @restockID AND itemID = @itemID;
+END;
+
+CREATE PROCEDURE GetSaleByID
+    @saleID INT
+AS
+BEGIN
+    SELECT * FROM v_sale WHERE id = @saleID;
+END;
+
+CREATE PROCEDURE GetSaleItemByID
+    @saleID INT,
+    @itemID INT
+AS
+BEGIN
+    SELECT * FROM saleItem WHERE saleID = @saleID AND itemID = @itemID;
+END;
+
+CREATE PROCEDURE GetFullRestock
+    @restockID INT
+AS
+BEGIN
+    SELECT
+        ri.restockID, ri.itemID, ri.quantity, ri.expiryDate, ri.unitCost, ri.totalCost,
+        i.name, i.currentPrice, i.supplier, i.unitType, i.discount, i.cachedCurrentStock, i.targetAmount
+    FROM restockItem AS ri
+    JOIN item AS i ON ri.itemID = i.id
+    WHERE ri.restockID = @restockID
+END;
+
+CREATE PROCEDURE GetFulLSale
+    @saleID INT
+AS
+BEGIN
+    SELECT
+        si.saleID, si.itemID, si.quantity, si.unitCost, si.discount, si.totalCost,
+        i.name, i.currentPrice, i.supplier, i.unitType, i.discount, i.cachedCurrentStock, i.targetAmount
+    FROM saleItem AS si
+    JOIN item AS i ON si.itemID = i.id
+    WHERE si.saleID = @saleID
+END;

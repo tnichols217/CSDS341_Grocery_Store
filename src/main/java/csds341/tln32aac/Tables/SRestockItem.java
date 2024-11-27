@@ -39,7 +39,7 @@ public class SRestockItem {
 
     public static SRestockItem getRestockItem (Integer restockID, Integer itemID, Connection conn) {
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM restockItem WHERE restockID = ? AND itemID = ?");
+            PreparedStatement stmt = conn.prepareStatement("EXEC GetRestockItemByID @restockID = ?, @itemID = ?;");
             stmt.setInt(1, restockID);
             stmt.setInt(2, itemID);
             ResultSet rs = stmt.executeQuery();
@@ -63,14 +63,7 @@ public class SRestockItem {
     public static ArrayList<SRestockItem> getRestock (Integer restockID, Connection conn) {
         ArrayList<SRestockItem> restockItems = new ArrayList<>();
         try {
-            PreparedStatement stmt = conn.prepareStatement(
-                "SELECT "
-                + "ri.restockID, ri.itemID, ri.quantity, ri.expiryDate, ri.unitCost, ri.totalCost, "
-                + "i.name, i.currentPrice, i.supplier, i.unitType, i.discount, i.cachedCurrentStock, i.targetAmount "
-                + "FROM restockItem AS ri "
-                + "WHERE si.saleID = ? "
-                + "JOIN item AS i ON si.itemID = i.id "
-            );
+            PreparedStatement stmt = conn.prepareStatement("EXEC GetFullRestock @restockID = ?;");
             stmt.setInt(1, restockID);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
