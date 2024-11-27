@@ -134,7 +134,7 @@ public class GUI {
         btnRestock.addActionListener(e -> showRestockPage());
         btnCheckStatus.addActionListener(e -> showStoreStatusPage());
         btnLogout.addActionListener(e -> {
-            dbAdapter.endShift(shift);
+            dbAdapter.endShift(employee, shift);
             employee = null;
             shift = null;
             frame.dispose();
@@ -528,9 +528,9 @@ public class GUI {
 
         ArrayList<SRestock> restocks = dbAdapter.getRestocks(100);
         Function<SRestock, String[]> statusFormatter = (SRestock r) -> {
-            return new String[]{r.id.toString(), r.supplierID.toString(), r.status, r.orderDate.toString(), r.confirmDate.toString(), r.deliveryDate.toString(), r.restockDate.toString(), r.additionalCost.toString()};
+            return new String[]{r.id.toString(), r.supplierID.toString(), r.status, r.orderDate.toString(), r.confirmDate == null ? "" : r.confirmDate.toString(), r.deliveryDate == null ? "" : r.deliveryDate.toString(), r.restockDate == null ? "" : r.restockDate.toString(), r.additionalCost.toString()};
         };
-        String[][] tableData = restocks.stream().map(statusFormatter).toArray(String[][]::new);
+        String[][] tableData = restocks.stream().filter(a -> a != null).map(statusFormatter).toArray(String[][]::new);
         String[] columns = new String[]{"ID", "Supplier ID", "Status", "Order Date", "Confirm Date", "Delivery Date", "Restock Date", "Additional Cost"};
 
         g.gridx = 1;
@@ -571,7 +571,7 @@ public class GUI {
         Function<SItem, String[]> statusFormatter = (SItem r) -> {
             return new String[]{r.id.toString(), r.name, r.currentPrice.toString(), r.supplier.toString(), r.unitType.toString(), r.discount.toString(), r.stock.toString(), r.targetAmount.toString()};
         };
-        String[][] tableData = restocks.stream().map(statusFormatter).toArray(String[][]::new);
+        String[][] tableData = restocks.stream().filter(a -> a != null).map(statusFormatter).toArray(String[][]::new);
         String[] columns = new String[]{"ID", "Name", "Current Price", "Supplier", "Unit Type", "Discount", "Stock", "Target Amount"};
 
         JTable table = new JTable(tableData, columns);

@@ -65,3 +65,91 @@ BEGIN
         PRINT 'Invalid EAN-13 barcode: Must be exactly 13 digits.';
     END
 END;
+
+CREATE PROCEDURE GetItems
+AS
+BEGIN
+    SELECT * FROM item
+END;
+
+CREATE PROCEDURE GetItemIDByBarcode
+    @Barcode BIGINT
+AS
+BEGIN
+    SELECT itemID
+    FROM barcode
+    WHERE barcode = @Barcode;
+END;
+
+CREATE PROCEDURE CreateSale
+    @employeeID INT,
+    @tip INT
+AS
+BEGIN
+    INSERT INTO sale (employeeID, tip)
+    VALUES (@employeeID, @tip);
+    
+    SELECT SCOPE_IDENTITY();
+END;
+
+CREATE PROCEDURE CreateSaleItem
+    @saleID INT,
+    @itemID INT,
+    @quantity INT,
+    @unitCost INT,
+    @discount INT
+AS
+BEGIN
+    INSERT INTO saleItem (saleID, itemID, quantity, unitCost, discount)
+    VALUES (@saleID, @itemID, @quantity, @unitCost, @discount);
+END;
+
+CREATE PROCEDURE GetRestocks
+AS
+BEGIN
+    SELECT * FROM v_restock;
+END;
+
+CREATE PROCEDURE SearchItems
+    @searchTerm VARCHAR(255)
+AS
+BEGIN
+    SELECT * FROM item WHERE name LIKE '%' + @searchTerm + '%'
+END;
+
+CREATE PROCEDURE CreateItem
+    @name VARCHAR(255),
+    @currentPrice INT,
+    @supplier INT,
+    @unitType VARCHAR(10),
+    @discount INT
+AS
+BEGIN
+    INSERT INTO item (name, currentPrice, supplier, unitType, discount)
+    VALUES (@name, @currentPrice, @supplier, @unitType, @discount);
+END;
+
+CREATE PROCEDURE EndShift
+    @employeeID INT,
+    @startTime SMALLDATETIME
+AS
+BEGIN
+    UPDATE shift
+    SET endTime = CURRENT_TIMESTAMP
+    WHERE startTime = @startTime AND employeeID = @employeeID;
+END;
+
+CREATE PROCEDURE StartShift
+    @employeeID INT,
+    @wage INT
+AS
+BEGIN
+    INSERT INTO shift (employeeID, wage) OUTPUT Inserted.startTime VALUES (@employeeID, @wage);
+END;
+
+CREATE PROCEDURE GetEmployeeByID
+    @employeeID INT
+AS
+BEGIN
+    SELECT * FROM employee WHERE id = @employeeID;
+END;

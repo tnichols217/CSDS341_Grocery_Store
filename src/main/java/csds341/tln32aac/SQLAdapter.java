@@ -57,7 +57,7 @@ public class SQLAdapter {
 
     public boolean validateEmployeeID(Integer employeeID) {
         try {
-            PreparedStatement statement = conn.prepareStatement("SELECT * FROM employee WHERE id = ?");
+            PreparedStatement statement = conn.prepareStatement("EXEC GetEmployeeByID @employeeID = ?;");
             statement.setInt(1, employeeID);
             ResultSet rs = statement.executeQuery();
             return rs.next();
@@ -68,7 +68,7 @@ public class SQLAdapter {
 
     public Timestamp startShift(SEmployee employee) {
         try {
-            PreparedStatement statement = conn.prepareStatement("INSERT INTO shift (employeeID, wage) OUTPUT Inserted.startTime VALUES (?, ?);");
+            PreparedStatement statement = conn.prepareStatement("EXEC StartShift @employeeID = ?, @wage = ?;");
             statement.setInt(1, employee.id);
             statement.setInt(2, employee.currentWage);
             
@@ -86,10 +86,11 @@ public class SQLAdapter {
         }
     }
 
-    public boolean endShift(Timestamp shiftID) {
+    public boolean endShift(SEmployee employee, Timestamp shiftID) {
         try {
-            PreparedStatement statement = conn.prepareStatement("UPDATE shift SET endTime = CURRENT_TIMESTAMP WHERE startTime = ?");
-            statement.setTimestamp(1, shiftID);
+            PreparedStatement statement = conn.prepareStatement("EXEC EndShift @employeeID = ?, @startTime = ?;");
+            statement.setInt(1, employee.id);
+            statement.setTimestamp(2, shiftID);
             statement.executeUpdate();
             conn.commit();
             return true;
@@ -101,7 +102,7 @@ public class SQLAdapter {
 
     public boolean addItem(String name, Integer currentPrice, Integer supplier, String unitType, Integer discount) {
         try {
-            PreparedStatement stmt = conn.prepareStatement("INSERT INTO item (name, currentPrice, supplier, unitType, discount) VALUES (?, ?, ?, ?, ?);");
+            PreparedStatement stmt = conn.prepareStatement("EXEC CreateItem @name = ?, @currentPrice = ?, @supplier = ?, @unitType = ?, @discount = ?;");
             stmt.setString(1, name);
             stmt.setInt(2, currentPrice);
             stmt.setInt(3, supplier);
@@ -123,8 +124,8 @@ public class SQLAdapter {
     public ArrayList<SItem> searchItems(String query, int quantity) {
         ArrayList<SItem> items = new ArrayList<>();
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM item WHERE name LIKE ?");
-            stmt.setString(1, "%" + query + "%");
+            PreparedStatement stmt = conn.prepareStatement("EXEC SearchItems @searchTerm = ?;");
+            stmt.setString(1, query);
             ResultSet rs = stmt.executeQuery();
             for (int i = 0; i < quantity && rs.next(); i++) {
                 items.add(new SItem(
@@ -147,7 +148,7 @@ public class SQLAdapter {
     public ArrayList<SRestock> getRestocks(int quantity) {
         ArrayList<SRestock> items = new ArrayList<>();
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM v_restock");
+            PreparedStatement stmt = conn.prepareStatement("EXEC GetRestocks;");
             ResultSet rs = stmt.executeQuery();
             for (int i = 0; i < quantity && rs.next(); i++) {
                 items.add(new SRestock(
@@ -171,7 +172,7 @@ public class SQLAdapter {
     public ArrayList<SItem> getItems(int quantity) {
         ArrayList<SItem> items = new ArrayList<>();
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM item");
+            PreparedStatement stmt = conn.prepareStatement("EXEC GetItems;");
             ResultSet rs = stmt.executeQuery();
             for (int i = 0; i < quantity && rs.next(); i++) {
                 items.add(new SItem(
@@ -193,7 +194,7 @@ public class SQLAdapter {
 
     public Integer getItemByBarcode(String barcode) {
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT itemID FROM barcode WHERE barcode = ?");
+            PreparedStatement stmt = conn.prepareStatement("EXEC GetItemIDByBarcode @Barcode = ?;");
             stmt.setString(1, barcode);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -223,7 +224,7 @@ public class SQLAdapter {
         try {
 
             // Insert into sales table
-            PreparedStatement stmt = conn.prepareStatement("INSERT INTO sale (employeeID, tip) VALUES (?, ?); SELECT SCOPE_IDENTITY();");
+            PreparedStatement stmt = conn.prepareStatement("EXEC CreateSale @employeeID = ?, @tip = ?;");
             stmt.setInt(1, employeeID);
             stmt.setInt(2, tip);
             
@@ -251,7 +252,7 @@ public class SQLAdapter {
 
             // Insert into sales_items table
             for (int i = 0; i < SItemsCondensed.size(); i++) {
-                stmt = conn.prepareStatement("INSERT INTO saleItem (saleID, itemID, quantity, unitCost, discount) VALUES (?,?,?,?,?);");
+                stmt = conn.prepareStatement("EXEC CreateSaleItem @saleID = ?, @itemID = ?, @quantity = ?, @unitCost = ?, @discount = ?;  ");
                 stmt.setInt(1, saleID);
                 stmt.setInt(2, SItemsCondensed.get(i).id);
                 stmt.setInt(3, quantityCondensed.get(i));
