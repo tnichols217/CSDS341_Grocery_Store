@@ -9,6 +9,7 @@ import csds341.tln32aac.Tables.SSale;
 import csds341.tln32aac.Tables.SSaleItem;
 
 import java.awt.*;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.BiConsumer;
@@ -20,6 +21,7 @@ public class GUI {
     private JFrame frame;
     private SQLAdapter dbAdapter;
     private SEmployee employee;
+    private Timestamp shift;
 
     public GUI(SQLAdapter dbAdapter) {
         this.dbAdapter = dbAdapter;
@@ -72,6 +74,7 @@ public class GUI {
             }
             if (employeeID != null && employeeID > 0 && dbAdapter.validateEmployeeID(employeeID)) {
                 employee = dbAdapter.getEmployeeByID(employeeID);
+                shift = dbAdapter.startShift(employee);
                 showMainMenu();
             } else {
                 JOptionPane.showMessageDialog(frame, "Invalid Employee ID", "Error", JOptionPane.ERROR_MESSAGE);
@@ -131,6 +134,9 @@ public class GUI {
         btnRestock.addActionListener(e -> showRestockPage());
         btnCheckStatus.addActionListener(e -> showStoreStatusPage());
         btnLogout.addActionListener(e -> {
+            dbAdapter.endShift(shift);
+            employee = null;
+            shift = null;
             frame.dispose();
             showLoginPage();
         });

@@ -65,9 +65,9 @@ CREATE TABLE sale (
 CREATE TABLE shift (
     employeeID INT REFERENCES employee(id),
     startTime SMALLDATETIME DEFAULT CURRENT_TIMESTAMP,
-    endTime SMALLDATETIME,
+    endTime SMALLDATETIME DEFAULT CURRENT_TIMESTAMP,
     wage INT NOT NULL,
-    paymentID INT NOT NULL REFERENCES payment(id),
+    paymentID INT REFERENCES payment(id),
     duration AS (
         DATEDIFF(MINUTE, startTime, endTime)
     ),

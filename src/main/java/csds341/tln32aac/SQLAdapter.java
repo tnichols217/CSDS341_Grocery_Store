@@ -65,6 +65,39 @@ public class SQLAdapter {
         }
     }
 
+    public Timestamp startShift(SEmployee employee) {
+        try {
+            PreparedStatement statement = conn.prepareStatement("INSERT INTO shift (employeeID, wage) OUTPUT Inserted.startTime VALUES (?, ?);");
+            statement.setInt(1, employee.id);
+            statement.setInt(2, employee.currentWage);
+            
+            ResultSet res = statement.executeQuery();
+
+            res.next();
+            
+            // Get the last inserted sale ID
+            Timestamp shiftID = res.getTimestamp(1);
+            conn.commit();
+            return shiftID;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public boolean endShift(Timestamp shiftID) {
+        try {
+            PreparedStatement statement = conn.prepareStatement("UPDATE shift SET endTime = CURRENT_TIMESTAMP WHERE startTime = ?");
+            statement.setTimestamp(1, shiftID);
+            statement.executeUpdate();
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public boolean addItem(String name, Integer currentPrice, Integer supplier, String unitType, Integer discount) {
         try {
             PreparedStatement stmt = conn.prepareStatement("INSERT INTO item (name, currentPrice, supplier, unitType, discount) VALUES (?, ?, ?, ?, ?);");
