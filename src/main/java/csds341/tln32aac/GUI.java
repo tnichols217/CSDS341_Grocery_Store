@@ -4,13 +4,17 @@ import javax.swing.*;
 
 import csds341.tln32aac.Tables.SEmployee;
 import csds341.tln32aac.Tables.SItem;
+import csds341.tln32aac.Tables.SRestock;
 import csds341.tln32aac.Tables.SSale;
 import csds341.tln32aac.Tables.SSaleItem;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class GUI {
     private JFrame frame;
@@ -61,11 +65,13 @@ public class GUI {
         // Add the panel to the center of the frame
         frame.add(centerPanel, g);
 
-        btnLogin.addActionListener(e -> showMainMenu());
-        
         btnLogin.addActionListener(e -> {
-            Integer employeeID = Integer.parseInt(txtID.getText().trim());
-            if (dbAdapter.validateEmployeeID(employeeID)) {
+            Integer employeeID = -1;
+            try {
+                employeeID = Integer.parseInt(txtID.getText().trim());
+            } catch (NumberFormatException ex) {
+            }
+            if (employeeID != null && employeeID > 0 && dbAdapter.validateEmployeeID(employeeID)) {
                 employee = dbAdapter.getEmployeeByID(employeeID);
                 showMainMenu();
             } else {
@@ -164,8 +170,6 @@ public class GUI {
         itemUnitType.setFont(new Font("Arial", Font.PLAIN, 20));
         JLabel itemDiscount = new JLabel("Item discount percentage: ");
         itemDiscount.setFont(new Font("Arial", Font.PLAIN, 20));
-        JLabel itemStock = new JLabel("Item stock amount: ");
-        itemStock.setFont(new Font("Arial", Font.PLAIN, 20));
 
         JTextField itemNameTxt = new JTextField(50);
         itemNameTxt.setPreferredSize(new Dimension(100, 50));
@@ -177,8 +181,6 @@ public class GUI {
         itemUnitTypeTxt.setPreferredSize(new Dimension(100, 50));
         JTextField itemDiscountTxt = new JTextField(50);
         itemDiscountTxt.setPreferredSize(new Dimension(100, 50));
-        JTextField itemStockTxt = new JTextField(50);
-        itemStockTxt.setPreferredSize(new Dimension(100, 50));
 
         JButton btnAddItem = new JButton("Add Item");
         btnAddItem.setFont(new Font("Arial", Font.PLAIN, 20));
@@ -196,8 +198,6 @@ public class GUI {
         panel.add(itemUnitTypeTxt);
         panel.add(itemDiscount);
         panel.add(itemDiscountTxt);
-        panel.add(itemStock);
-        panel.add(itemStockTxt);
         
 
         g.gridx = 0; // Center column
@@ -218,12 +218,11 @@ public class GUI {
             Integer supplier = Integer.parseInt(itemSupplierTxt.getText().trim());
             String unitType = itemUnitTypeTxt.getText().trim();
             Integer discount = Integer.parseInt(itemDiscount.getText().trim());
-            Integer stock = Integer.parseInt(itemStock.getText().trim());
 
             
-            if (dbAdapter.addItem(item, currentPrice, supplier, unitType, discount, stock)) {
+            if (dbAdapter.addItem(item, currentPrice, supplier, unitType, discount)) {
                         JOptionPane.showMessageDialog(frame, "Item successfully added!");
-            } 
+            }
 
         });
         frame.setVisible(true);
@@ -234,6 +233,7 @@ public class GUI {
 
     /**
      * shows item quantity page
+     * @param cb Calls back the function with the quantity as an integer
      */
     private void askItemQuantity(Consumer<Integer> cb) {
         JFrame frame = new JFrame("Quantity");
@@ -362,24 +362,13 @@ public class GUI {
 
         backbutton.addActionListener(e -> showMainMenu());
 
-        btnAdd.addActionListener(e -> {
-            showItemSearchDialog(item -> {
-                String barcode = txtBarcode.getText().trim();
-                if (!barcode.isEmpty()) {
-                    Integer itemID = dbAdapter.getItemByBarcode(barcode);
-                    SItem item = dbAdapter.getItemByID(itemID);
-                    if (item != null) {
-                        items.add(item);
-                        quantities.add(q);
-                        itemList.addElement(item.name + " - " + q);
-                    } else {
-                        JOptionPane.showMessageDialog(frame, "Item not found!", "Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                };
+        btnSearch.addActionListener(e -> {
+            showItemSearchDialog((i, q) -> {
+                items.add(i);
+                quantities.add(q);
+                itemList.addElement(i.name + " - " + q);
             }); 
-        }
-
-        );
+        });
 
         btnCheckout.addActionListener(e -> {
             Integer saleID = dbAdapter.createSale(employee.id, items, quantities, 0);
@@ -407,16 +396,17 @@ public class GUI {
 
     /**
      * Opens a window to search for items
-     * @param itemList The list of items to populate with the searched items
-     * DefaultListModel<String> itemList
+     * @param cb The callback for the item and its quantity to be consumed
      * 
      * ok for show item search dialog this is how it goes
      * type in item id, click search
      * item name will pop up
      * click add and it will ask for item quantity and once u type quantity and hit save
      * everything will show up together
+     * 
+     * Done, just idk why cant type in the quantity window until we close the search window, but it works, even with multiple item selections
      */
-    private void showItemSearchDialog(Consumer<Integer> cb) {
+    private void showItemSearchDialog(BiConsumer<SItem, Integer> cb) {
         JDialog dialog = new JDialog(frame, "Item Search", true);
         dialog.setSize(400, 300);
         dialog.setLayout(new BorderLayout());
@@ -433,42 +423,26 @@ public class GUI {
         inputPanel.add(txtSearch, BorderLayout.CENTER);
         inputPanel.add(btnSearch, BorderLayout.EAST);
 
+        ArrayList<SItem> items = new ArrayList<SItem>();
+
         btnSearch.addActionListener(e -> {
             searchResults.clear();
-            Integer name = Integer.parseInt(txtSearch.getText().trim());
-            //String result = dbAdapter.searchItems(name).name;
-            //searchResults.addElement(result);
+            String name = txtSearch.getText().trim();
+            items.clear();
+            items.addAll(dbAdapter.searchItems(name));
+            for (SItem item : items) {
+                searchResults.addElement(item.name);
+            }
         });
 
         btnAdd.addActionListener(e -> {
-            cb.accept(Integer.parseInt(searchResults.get(0)));
+            int[] selected = searchDisplay.getSelectedIndices();
+            for (int s: selected) {
+                askItemQuantity(q -> {
+                    cb.accept(items.get(s), q);
+                });
+            }
         });
-
-        // btnAdd.addActionListener(e -> {
-        //     askItemQuantity(q -> { 
-        //         String itemName = searchResults.get(0).trim();
-        //         if (!itemName.isEmpty()) {
-        //             Integer itemID = dbAdapter.getItemByBarcode(barcode);
-        //             SItem item = dbAdapter.getItemByID(itemID);
-        //             if (item != null) {
-        //                 showSalePage.items.add(item);
-        //                 quantities.add(q);
-        //                 itemList.addElement(item.name + " - " + q);
-        //             } else {
-        //                 JOptionPane.showMessageDialog(frame, "Item not found!", "Error", JOptionPane.ERROR_MESSAGE);
-        //             }
-        //         };
-        //     }); 
-
-        // });
-
-        // btnAdd.addActionListener(e -> {
-        //     String selectedItem = searchDisplay.getSelectedValue();
-        //     if (selectedItem != null) {
-        //         itemList.addElement(selectedItem);
-        //         dialog.dispose();
-        //     }
-        // });
 
         dialog.add(inputPanel, BorderLayout.NORTH);
         dialog.add(new JScrollPane(searchDisplay), BorderLayout.CENTER);
@@ -485,6 +459,16 @@ public class GUI {
         frame.setTitle("Restock");
         JButton backbutton = new JButton("Back");
         frame.add(backbutton);
+
+        ArrayList<SRestock> restocks = dbAdapter.getRestocks(100);
+        Function<SRestock, String[]> statusFormatter = (SRestock r) -> {
+            return new String[]{r.id.toString(), r.supplierID.toString(), r.status, r.orderDate.toString(), r.confirmDate.toString(), r.deliveryDate.toString(), r.restockDate.toString(), r.additionalCost.toString()};
+        };
+        String[][] tableData = restocks.stream().map(statusFormatter).toArray(String[][]::new);
+        String[] columns = new String[]{"ID", "Supplier ID", "Status", "Order Date", "Confirm Date", "Delivery Date", "Restock Date", "Additional Cost"};
+
+        JTable table = new JTable(tableData, columns);
+        frame.add(new JScrollPane(table));
         
         // Implement similar logic for displaying restock details and updating statuses
         // ...
@@ -499,6 +483,18 @@ public class GUI {
     public void showStoreStatusPage() {
         frame.getContentPane().removeAll();
         frame.setTitle("Store Status");
+
+
+        ArrayList<SItem> restocks = dbAdapter.getItems(100);
+        Function<SItem, String[]> statusFormatter = (SItem r) -> {
+            return new String[]{r.id.toString(), r.name, r.currentPrice.toString(), r.supplier.toString(), r.unitType.toString(), r.discount.toString(), r.stock.toString(), r.targetAmount.toString()};
+        };
+        String[][] tableData = restocks.stream().map(statusFormatter).toArray(String[][]::new);
+        String[] columns = new String[]{"ID", "Name", "Current Price", "Supplier", "Unit Type", "Discount", "Stock", "Target Amount"};
+
+        JTable table = new JTable(tableData, columns);
+        frame.add(new JScrollPane(table));
+
         // Implement similar logic for displaying inventory details
         // ...
 

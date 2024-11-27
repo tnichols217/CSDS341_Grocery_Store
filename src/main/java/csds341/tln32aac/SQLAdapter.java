@@ -65,15 +65,14 @@ public class SQLAdapter {
         }
     }
 
-    public boolean addItem(String name, Integer currentPrice, Integer supplier, String unitType, Integer discount, Integer stock) {
+    public boolean addItem(String name, Integer currentPrice, Integer supplier, String unitType, Integer discount) {
         try {
-            PreparedStatement stmt = conn.prepareStatement("INSERT INTO item (name, currentPrice, supplier, unitType, discount, stock ) VALUES (?, ?, ?, ?, ?, ?);");
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO item (name, currentPrice, supplier, unitType, discount) VALUES (?, ?, ?, ?, ?);");
             stmt.setString(1, name);
             stmt.setInt(2, currentPrice);
             stmt.setInt(3, supplier);
             stmt.setString(4, unitType);
             stmt.setInt(5, discount);
-            stmt.setInt(6, stock);
             stmt.execute();
             conn.commit();
         } catch (SQLException e) {
@@ -83,18 +82,74 @@ public class SQLAdapter {
         return true;
 
     }
-    public ArrayList<String> searchItems(String query) {
+    public ArrayList<SItem> searchItems(String query) {
         return searchItems(query, 100);
     }
 
-    public ArrayList<String> searchItems(String query, int quantity) {
-        ArrayList<String> items = new ArrayList<>();
+    public ArrayList<SItem> searchItems(String query, int quantity) {
+        ArrayList<SItem> items = new ArrayList<>();
         try {
-            PreparedStatement stmt = conn.prepareStatement("SELECT name FROM item WHERE name LIKE ?");
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM item WHERE name LIKE ?");
             stmt.setString(1, "%" + query + "%");
             ResultSet rs = stmt.executeQuery();
             for (int i = 0; i < quantity && rs.next(); i++) {
-                items.add(rs.getString("name"));
+                items.add(new SItem(
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getInt("currentPrice"),
+                    rs.getInt("supplier"),
+                    rs.getString("unitType"),
+                    rs.getInt("discount"),
+                    rs.getInt("cachedCurrentStock"),
+                    rs.getInt("targetAmount")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return items;
+    }
+
+    public ArrayList<SRestock> getRestocks(int quantity) {
+        ArrayList<SRestock> items = new ArrayList<>();
+        try {
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM v_restock");
+            ResultSet rs = stmt.executeQuery();
+            for (int i = 0; i < quantity && rs.next(); i++) {
+                items.add(new SRestock(
+                    rs.getInt("id"),
+                    rs.getInt("supplierID"),
+                    rs.getString("status"),
+                    rs.getDate("orderDate"),
+                    rs.getDate("confirmDate"),
+                    rs.getDate("deliveryDate"),
+                    rs.getDate("restockDate"),
+                    rs.getInt("additionalCost"),
+                    rs.getInt("totalCost")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return items;
+    }
+
+    public ArrayList<SItem> getItems(int quantity) {
+        ArrayList<SItem> items = new ArrayList<>();
+        try {
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM item");
+            ResultSet rs = stmt.executeQuery();
+            for (int i = 0; i < quantity && rs.next(); i++) {
+                items.add(new SItem(
+                    rs.getInt("id"),
+                    rs.getString("name"),
+                    rs.getInt("currentPrice"),
+                    rs.getInt("supplier"),
+                    rs.getString("unitType"),
+                    rs.getInt("discount"),
+                    rs.getInt("cachedCurrentStock"),
+                    rs.getInt("targetAmount")
+                ));
             }
         } catch (SQLException e) {
             e.printStackTrace();
