@@ -270,6 +270,45 @@ public class GUI {
     }
 
     /**
+     * shows the tip selection page
+     * @param cb Calls back the function with the quantity as an integer
+     */
+    private void askTip(Consumer<Integer> cb) {
+        JFrame frame = new JFrame("Tip");
+        frame.setSize(400, 300);
+        frame.setLayout(new GridBagLayout());
+
+
+        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JLabel quantity = new JLabel("Tip:");
+        quantity.setFont(new Font("Arial", Font.PLAIN, 20));
+        JTextField quantityText = new JTextField(10);
+        JButton btnSave = new JButton("Save");
+        btnSave.setPreferredSize(new Dimension(100, 40));
+        btnSave.setFont(new Font("Arial", Font.ITALIC, 20));
+        
+
+        centerPanel.add(quantity);
+        centerPanel.add(quantityText);
+        centerPanel.add(btnSave);
+        
+        btnSave.addActionListener(e -> {
+            cb.accept(Integer.parseInt(quantityText.getText().trim()));
+        });
+
+        btnSave.addActionListener(e -> frame.dispose());
+
+        GridBagConstraints g = new GridBagConstraints();
+        g.gridx = 0;
+        g.gridy = 0;
+        g.anchor = GridBagConstraints.CENTER;
+        // Add the panel to the center of the frame
+        frame.add(centerPanel, g);
+        
+        frame.setVisible(true);
+    }
+
+    /**
      * Shows the create a sale page
      */
     public void showSalePage() {
@@ -370,23 +409,25 @@ public class GUI {
         });
 
         btnCheckout.addActionListener(e -> {
-            Integer saleID = dbAdapter.createSale(employee.id, items, quantities, 0);
-            if (saleID != null) {
-                SSale sale = dbAdapter.getSaleByID(saleID);
-                ArrayList<SSaleItem> saleItems = dbAdapter.getFullSale(saleID);
-                String receipt = "Sale number: " + sale.id.toString() + "\n" + 
+            askTip(t -> {
+                Integer saleID = dbAdapter.createSale(employee.id, items, quantities, t);
+                if (saleID != null) {
+                    SSale sale = dbAdapter.getSaleByID(saleID);
+                    ArrayList<SSaleItem> saleItems = dbAdapter.getFullSale(saleID);
+                    String receipt = "Sale number: " + sale.id.toString() + "\n" + 
                     String.format("%20s %5s %5s", "Name", "Num", "Total") +
-                    saleItems.stream()
+                        saleItems.stream()
                         .map(s -> "" + String.format("%20s", s.item.name) + " " + String.format("%5d", s.quantity) + " " + String.format("%5d", s.totalCost))
-                        .reduce("", (a, b) -> a + "\n" + b) +
-                    String.format("\nTotal cost: %d", sale.total);
-                JOptionPane.showMessageDialog(frame, receipt, "Reciept", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(frame, "Failed to create sale", "Failiure", JOptionPane.INFORMATION_MESSAGE);
-            }
-            itemList.clear();
-            items.clear();
-            quantities.clear();
+                            .reduce("", (a, b) -> a + "\n" + b) +
+                            String.format("\nTotal cost: %d", sale.total);
+                    JOptionPane.showMessageDialog(frame, receipt, "Reciept", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Failed to create sale", "Failiure", JOptionPane.INFORMATION_MESSAGE);
+                }
+                itemList.clear();
+                items.clear();
+                quantities.clear();
+            });
         });
 
         frame.add(panel, g);
