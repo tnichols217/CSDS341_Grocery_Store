@@ -23,7 +23,7 @@ END;
 GO;
 
 CREATE TRIGGER trg_decrease_stock
-ON sale
+ON saleItem
 AFTER INSERT
 AS
 BEGIN
@@ -31,8 +31,7 @@ BEGIN
     SET cachedCurrentStock = cachedCurrentStock - si.quantity
     FROM item
     JOIN saleItem AS si ON item.id = si.itemID
-    JOIN inserted AS i ON si.saleID = i.id
-    JOIN deleted AS d ON i.id = d.id;
+    JOIN inserted AS i ON si.saleID = i.saleID AND si.itemID = i.itemID;
 END;
 
 GO;
@@ -72,8 +71,17 @@ BEGIN
             SET @RestockID = SCOPE_IDENTITY();
         END
 
-        INSERT INTO restockItem (restockID, itemID, quantity, expiryDate, unitCost)
-        VALUES (@RestockID, @ItemID, @TargetAmount, DATEADD(month, 2, GETDATE()), @CurrentPrice);
+        DECLARE @RestockItemID INT;
+        SELECT @RestockItemID = id
+        FROM restockItem AS ri
+        JOIN restock AS r ON r.id = ri.restockID
+        WHERE ri.itemID = @ItemID AND r.status = 'created' AND r.supplierID = @Supplier;
+
+        IF @RestockItemID IS NULL
+        BEGIN
+            INSERT INTO restockItem (restockID, itemID, quantity, expiryDate, unitCost)
+            VALUES (@RestockID, @ItemID, @TargetAmount, DATEADD(month, 2, GETDATE()), @CurrentPrice);
+        END
 
         FETCH NEXT FROM stock_cursor INTO @ItemID, @Supplier, @CurrentPrice, @TargetAmount;
     END

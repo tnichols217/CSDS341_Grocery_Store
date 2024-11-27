@@ -108,7 +108,7 @@ CREATE TABLE restockItem (
     expiryDate DATE NOT NULL,
     unitCost INT NOT NULL,
     totalCost AS (
-        unitCost * quantity / 1000
+        unitCost * quantity
     ),
     PRIMARY KEY (restockID, itemID)
 );

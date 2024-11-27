@@ -426,10 +426,10 @@ public class GUI {
                     String receipt = "Sale number: " + sale.id.toString() + "\n" + 
                     String.format("%20s %5s %5s", "Name", "Num", "Total") +
                         saleItems.stream()
-                        .map(s -> "" + String.format("%20s", s.item.name) + " " + String.format("%5d", s.quantity) + " " + String.format("%5f", ((double) s.totalCost)/100))
+                        .map(s -> "" + String.format("%20s", s.item.name) + " " + String.format("%5d", s.quantity) + " " + String.format("%.2f", ((double) s.totalCost)/100))
                             .reduce("", (a, b) -> a + "\n" + b) +
-                            String.format("\nTip: %d", ((double) sale.tipAmount)/100) +
-                            String.format("\nTotal cost: %d", sale.total);
+                            String.format("\nTip: %.2f", ((double) sale.tipAmount)/100) +
+                            String.format("\nTotal cost: %.2f", ((double) sale.total) / 100);
                     JOptionPane.showMessageDialog(frame, receipt, "Reciept", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(frame, "Failed to create sale", "Failiure", JOptionPane.INFORMATION_MESSAGE);

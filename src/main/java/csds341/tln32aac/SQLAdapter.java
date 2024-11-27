@@ -2,6 +2,7 @@ package csds341.tln32aac;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDriver;
 
@@ -233,14 +234,29 @@ public class SQLAdapter {
             // Get the last inserted sale ID
             int saleID = res.getInt(1);
 
-            // Insert into sales_items table
+            ArrayList<SItem> SItemsCondensed = new ArrayList<>();
+            ArrayList<Integer> quantityCondensed = new ArrayList<>();
             for (int i = 0; i < saleItems.size(); i++) {
+                SItem b = saleItems.get(i);
+                try {
+                    SItem first = SItemsCondensed.stream().filter((SItem a) -> a.id == b.id).findFirst().get();
+                    int ind = SItemsCondensed.indexOf(first);
+                    quantityCondensed.set(ind, quantityCondensed.get(ind) + quantity.get(i));
+
+                } catch (NoSuchElementException e) {
+                    SItemsCondensed.add(b);
+                    quantityCondensed.add(quantity.get(i));
+                }
+            }
+
+            // Insert into sales_items table
+            for (int i = 0; i < SItemsCondensed.size(); i++) {
                 stmt = conn.prepareStatement("INSERT INTO saleItem (saleID, itemID, quantity, unitCost, discount) VALUES (?,?,?,?,?);");
                 stmt.setInt(1, saleID);
-                stmt.setInt(2, saleItems.get(i).id);
-                stmt.setInt(3, quantity.get(i));
-                stmt.setInt(4, saleItems.get(i).currentPrice);
-                stmt.setInt(5, saleItems.get(i).discount);
+                stmt.setInt(2, SItemsCondensed.get(i).id);
+                stmt.setInt(3, quantityCondensed.get(i));
+                stmt.setInt(4, SItemsCondensed.get(i).currentPrice);
+                stmt.setInt(5, SItemsCondensed.get(i).discount);
                 stmt.executeUpdate();
             }
             conn.commit();
