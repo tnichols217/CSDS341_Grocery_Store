@@ -62,7 +62,6 @@ public class GUI {
         centerPanel.add(btnLogin);
 
         g.gridy = 3;
-        // Add the panel to the center of the frame
         frame.add(centerPanel, g);
 
         btnLogin.addActionListener(e -> {
@@ -411,6 +410,7 @@ public class GUI {
         dialog.setSize(400, 300);
         dialog.setLayout(new BorderLayout());
 
+
         JTextField txtSearch = new JTextField();
         JButton btnSearch = new JButton("Search");
         btnSearch.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -457,8 +457,20 @@ public class GUI {
     public void showRestockPage() {
         frame.getContentPane().removeAll();
         frame.setTitle("Restock");
+        
+        GridBagConstraints g = new GridBagConstraints();
+        g.gridx = 0;
+        g.gridy = 0;
+        g.insets = new Insets(10, 10, 0, 30); 
+        g.anchor = GridBagConstraints.NORTHWEST;
+
         JButton backbutton = new JButton("Back");
-        frame.add(backbutton);
+        backbutton.setFont(new Font("Arial", Font.PLAIN, 20));
+        backbutton.setPreferredSize(new Dimension(100, 40));
+
+        frame.add(backbutton, g);
+
+        backbutton.addActionListener(e -> showMainMenu());
 
         ArrayList<SRestock> restocks = dbAdapter.getRestocks(100);
         Function<SRestock, String[]> statusFormatter = (SRestock r) -> {
@@ -483,6 +495,20 @@ public class GUI {
     public void showStoreStatusPage() {
         frame.getContentPane().removeAll();
         frame.setTitle("Store Status");
+
+        GridBagConstraints g = new GridBagConstraints();
+        g.gridx = 0;
+        g.gridy = 0;
+        g.insets = new Insets(10, 10, 0, 30); 
+        g.anchor = GridBagConstraints.NORTHWEST;
+
+        JButton backbutton = new JButton("Back");
+        backbutton.setFont(new Font("Arial", Font.PLAIN, 20));
+        backbutton.setPreferredSize(new Dimension(100, 40));
+
+        frame.add(backbutton, g);
+
+        backbutton.addActionListener(e -> showMainMenu());
 
 
         ArrayList<SItem> restocks = dbAdapter.getItems(100);
