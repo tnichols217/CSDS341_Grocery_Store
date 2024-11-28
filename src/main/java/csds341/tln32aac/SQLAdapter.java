@@ -81,6 +81,10 @@ public class SQLAdapter {
             conn.commit();
             return shiftID;
         } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+            }
             e.printStackTrace();
             return null;
         }
@@ -95,6 +99,10 @@ public class SQLAdapter {
             conn.commit();
             return true;
         } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+            }
             e.printStackTrace();
             return false;
         }
@@ -111,12 +119,16 @@ public class SQLAdapter {
             stmt.execute();
             conn.commit();
         } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+            }
             e.printStackTrace();
             return false;
         }
         return true;
     }
-    
+
     public ArrayList<SItem> searchItems(String query) {
         return searchItems(query, 100);
     }
@@ -214,6 +226,10 @@ public class SQLAdapter {
             stmt.execute();
             conn.commit();
         } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+            }
             e.printStackTrace();
             return false;
         }
@@ -250,7 +266,7 @@ public class SQLAdapter {
                 }
             }
 
-            // Insert into sales_items table
+            // Insert into saleItem table
             for (int i = 0; i < SItemsCondensed.size(); i++) {
                 stmt = conn.prepareStatement("EXEC CreateSaleItem @saleID = ?, @itemID = ?, @quantity = ?, @unitCost = ?, @discount = ?;  ");
                 stmt.setInt(1, saleID);
@@ -263,6 +279,10 @@ public class SQLAdapter {
             conn.commit();
             return saleID;
         } catch (SQLException e) {
+            try {
+                conn.rollback();
+            } catch (SQLException ex) {
+            }
             e.printStackTrace();
         }
         return null;

@@ -1,7 +1,5 @@
 USE Grocery;
 
-GO;
-
 CREATE TRIGGER trg_increase_stock
 ON restock
 AFTER UPDATE
@@ -20,8 +18,6 @@ BEGIN
     END
 END;
 
-GO;
-
 CREATE TRIGGER trg_decrease_stock
 ON saleItem
 AFTER INSERT
@@ -33,8 +29,6 @@ BEGIN
     JOIN saleItem AS si ON item.id = si.itemID
     JOIN inserted AS i ON si.saleID = i.saleID AND si.itemID = i.itemID;
 END;
-
-GO;
 
 CREATE TRIGGER trg_CheckStockAndRestock
 ON item

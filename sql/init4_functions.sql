@@ -1,8 +1,5 @@
 USE Grocery;
 
-DROP TRIGGER add_manufacturer;
-
-DROP PROCEDURE InsertBarcode;
 CREATE PROCEDURE InsertBarcode
     @ean13 VARCHAR(13),
     @itemID INT
